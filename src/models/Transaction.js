@@ -7,7 +7,8 @@ const TransactionSchema = new mongoose.Schema({
   type: { type: String, enum: ['Income', 'Expense'], required: true },
   category: { type: String, default: 'Uncategorized' },
   reference: { type: String },
-  status: { type: String, enum: ['Completed', 'Pending', 'Failed'], default: 'Completed' }
+  status: { type: String, enum: ['Completed', 'Pending', 'Failed'], default: 'Completed' },
+  isReconciled: { type: Boolean, default: false }
 }, { timestamps: true });
 
 export default mongoose.models.Transaction || mongoose.model("Transaction", TransactionSchema);

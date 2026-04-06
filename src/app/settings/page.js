@@ -122,6 +122,7 @@ export default function Settings() {
                 <option value="GBP">GBP (£)</option>
                 <option value="CAD">CAD ($)</option>
                 <option value="AUD">AUD ($)</option>
+                <option value="INR">INR (₹)</option>
               </select>
             </div>
             <div className="form-group">
@@ -136,6 +137,7 @@ export default function Settings() {
                 <option value="EST">Eastern Time (EST)</option>
                 <option value="CST">Central Time (CST)</option>
                 <option value="PST">Pacific Time (PST)</option>
+                <option value="IST">Indian Standard Time (IST)</option>
               </select>
             </div>
           </div>
