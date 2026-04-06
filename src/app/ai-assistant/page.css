@@ -52,6 +52,21 @@
   font-weight: 600;
 }
 
+.ai-banner-error {
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(180, 60, 60, 0.35);
+  background: rgba(180, 60, 60, 0.08);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--color-text-main);
+}
+
+.ai-banner-error strong {
+  font-weight: 800;
+}
+
 .ai-insights {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
