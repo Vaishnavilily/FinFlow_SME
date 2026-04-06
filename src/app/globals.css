@@ -141,14 +141,3 @@ button {
   gap: 8px;
 }
 
-.dark-theme {
-  --color-primary: #1E90FF;
-  --color-bg-sidebar: #1A1A1A;
-  --color-bg-main: #121212;
-  --color-text-main: #EAEAEA;
-  --color-text-secondary: #AAAAAA;
-  --color-border: #333333;
-  --color-hover: #2A2A2A;
-  --color-success: #4CAF50;
-  --color-danger: #FF6B6B;
-}
