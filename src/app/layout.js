@@ -1,7 +1,6 @@
 import "./globals.css";
 import Sidebar from "@/components/layout/Sidebar";
 import { SettingsProvider } from "@/context/SettingsContext";
-import { ThemeProvider } from "@/context/ThemeContext"; 
 
 export const metadata = {
   title: "Finflow - Financial Management Dashboard",
@@ -12,17 +11,15 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        {/* Wrap everything in ThemeProvider so dark mode applies globally */}
-        <ThemeProvider>
-          <SettingsProvider>
-            <div className="layout-container">
-              <Sidebar />
-              <main className="main-content">
-                {children}
-              </main>
-            </div>
-          </SettingsProvider>
-        </ThemeProvider>
+        {/* SettingsProvider fetches currency/timezone once and shares it everywhere */}
+        <SettingsProvider>
+          <div className="layout-container">
+            <Sidebar />
+            <main className="main-content">
+              {children}
+            </main>
+          </div>
+        </SettingsProvider>
       </body>
     </html>
   );
