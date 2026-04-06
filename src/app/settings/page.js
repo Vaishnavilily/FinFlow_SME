@@ -13,8 +13,7 @@ export default function Settings() {
     companyName: "",
     email: "",
     currency: "USD",
-    timezone: "UTC",
-    theme: "Light"
+    timezone: "UTC"
   });
 
   useEffect(() => {
@@ -141,21 +140,7 @@ export default function Settings() {
               </select>
             </div>
           </div>
-
-          <div className="form-group" style={{maxWidth: '50%'}}>
-            <label>App Theme</label>
-            <select 
-              name="theme" 
-              className="form-control" 
-              value={formData.theme} 
-              onChange={handleChange}
-            >
-              <option value="Light">Light</option>
-              <option value="Dark">Dark</option>
-              <option value="System">System Default</option>
-            </select>
-          </div>
-
+          
           <div className="form-actions">
             <button 
               type="submit" 
