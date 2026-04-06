@@ -1,23 +1,21 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
-  FileText,
-  Users,
   ShoppingCart,
   CreditCard,
   Briefcase,
   Settings,
-  Menu,
   PieChart,
   Plus,
   Landmark
 } from "lucide-react";
-import "./Sidebar.css"; // We'll create this CSS next
+import "./Sidebar.css";
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
 
   const navigation = [
     { name: "Dashboard", href: "/", icon: LayoutDashboard },
@@ -58,6 +56,12 @@ export default function Sidebar() {
     { name: "Reports", href: "/reports", icon: PieChart },
     { name: "Settings", href: "/settings", icon: Settings },
   ];
+
+  const handleLogout = () => {
+    localStorage.clear();
+    sessionStorage.clear();
+    router.push("https://finflow-gateway.vercel.app/"); // ✅ redirect to gateway login
+  };
 
   return (
     <aside className="sidebar">
@@ -108,6 +112,13 @@ export default function Sidebar() {
             )}
           </div>
         ))}
+
+        {/* 🔒 Logout button right below Settings */}
+        <div className="sidebar-logout">
+          <button className="logout-btn" onClick={handleLogout}>
+            LOGOUT
+          </button>
+        </div>
       </nav>
     </aside>
   );

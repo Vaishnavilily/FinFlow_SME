@@ -68,6 +68,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  flex: 1; /* ensures nav grows and logout stays at bottom */
 }
 
 .nav-item, .nav-section-title {
@@ -118,4 +119,26 @@
   color: var(--color-primary);
   background-color: #F0F4F8;
   font-weight: 500;
+}
+
+/* 🔒 Logout button styling */
+.sidebar-logout {
+  padding: 12px;
+  margin-top: auto; /* pushes logout to bottom */
+}
+
+.logout-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.logout-btn:hover {
+  background-color: var(--color-hover);
 }
