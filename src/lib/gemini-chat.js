@@ -23,6 +23,34 @@ function toGeminiHistory(messages = []) {
 }
 
 /**
+ * Gemini requires `history` to start with role `user`. The UI may prepend a
+ * bot welcome before any user message — that becomes `model` first and triggers
+ * "First content should be with role 'user', got model".
+ * History for startChat must be all turns *before* the latest user message,
+ * with any leading `model` turns (welcome) removed.
+ */
+function buildGeminiHistoryBeforeLastUser(messages = []) {
+  if (!Array.isArray(messages)) return [];
+
+  let lastUserIdx = -1;
+  for (let i = messages.length - 1; i >= 0; i--) {
+    if (messages[i]?.role === "user" && String(messages[i].text || "").trim()) {
+      lastUserIdx = i;
+      break;
+    }
+  }
+  if (lastUserIdx < 0) return [];
+
+  const prior = messages.slice(0, lastUserIdx);
+  const turns = toGeminiHistory(prior);
+  let start = 0;
+  while (start < turns.length && turns[start].role === "model") {
+    start += 1;
+  }
+  return turns.slice(start);
+}
+
+/**
  * POST handler for Gemini chat. Used by /api/chat (and /api/ai).
  * Expects JSON: { messages: [{ role: "user"|"bot", text: string }], model?: string }
  */
@@ -49,7 +77,6 @@ export async function handleGeminiChat(request) {
       systemInstruction: buildSystemInstruction(),
     });
 
-    const history = toGeminiHistory(messages);
     const lastUser = [...messages]
       .reverse()
       .find((m) => m?.role === "user" && String(m.text || "").trim());
@@ -61,8 +88,10 @@ export async function handleGeminiChat(request) {
       );
     }
 
+    const history = buildGeminiHistoryBeforeLastUser(messages);
+
     const chat = model.startChat({
-      history: history.slice(0, -1),
+      history,
       generationConfig: {
         temperature: 0.4,
         topP: 0.9,
