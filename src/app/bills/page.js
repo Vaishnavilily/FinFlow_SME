@@ -1,4 +1,5 @@
 "use client";
+import { useSettings } from "@/context/SettingsContext";
 import { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import Modal from "@/components/ui/Modal";
@@ -11,7 +12,7 @@ export default function Bills() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBill, setEditingBill] = useState(null);
-
+  const { currencySymbol } = useSettings();
   useEffect(() => {
     async function fetchBills() {
       try {
@@ -76,7 +77,7 @@ export default function Bills() {
       label: "Amount",
       key: "total",
       className: "fw-500",
-      render: (row) => `$${row.total.toFixed(2)}`
+      render: (row) => `${currencySymbol}${row.total.toFixed(2)}`
     },
     {
       label: "Status",

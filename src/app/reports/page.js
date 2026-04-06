@@ -1,4 +1,5 @@
 "use client";
+import { useSettings } from "@/context/SettingsContext";
 import { useState, useEffect } from "react";
 import { TrendingUp, TrendingDown, DollarSign, FileText, AlertCircle } from "lucide-react";
 import "./page.css";
@@ -7,6 +8,7 @@ export default function Reports() {
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState("all-time");
+  const { currencySymbol } = useSettings();
 
   useEffect(() => {
     async function fetchReport() {
@@ -71,7 +73,7 @@ export default function Reports() {
       <section className="reports-grid">
         <div className="wave-card report-card">
           <div className="report-card-title">Net Profit</div>
-          <div className="report-card-value">${data.netProfit.toFixed(2)}</div>
+          <div className="report-card-value">{currencySymbol}{data.netProfit.toFixed(2)}</div>
           <div className={`report-card-trend ${data.netProfit >= 0 ? 'trend-positive' : 'trend-negative'}`}>
             {data.netProfit >= 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
             <span>Net Earnings</span>
@@ -80,7 +82,7 @@ export default function Reports() {
 
         <div className="wave-card report-card">
           <div className="report-card-title">Outstanding Receivables</div>
-          <div className="report-card-value">${data.receivables.toFixed(2)}</div>
+          <div className="report-card-value">{currencySymbol}{data.receivables.toFixed(2)}</div>
           <div className="report-card-trend trend-neutral">
             <FileText size={16} />
             <span>Unpaid Invoices</span>
@@ -89,7 +91,7 @@ export default function Reports() {
 
         <div className="wave-card report-card">
           <div className="report-card-title">Accounts Payable</div>
-          <div className="report-card-value">${data.payables.toFixed(2)}</div>
+          <div className="report-card-value">{currencySymbol}{data.payables.toFixed(2)}</div>
           <div className="report-card-trend trend-negative">
             <AlertCircle size={16} />
             <span>Unpaid Vendor Bills</span>
@@ -98,7 +100,7 @@ export default function Reports() {
 
         <div className="wave-card report-card">
           <div className="report-card-title">Total Revenue</div>
-          <div className="report-card-value">${data.totalIncome.toFixed(2)}</div>
+          <div className="report-card-value">{currencySymbol}{data.totalIncome.toFixed(2)}</div>
           <div className="report-card-trend trend-positive">
             <DollarSign size={16} />
             <span>Total Income</span>
@@ -144,11 +146,11 @@ export default function Reports() {
             <div className="progress-legend">
               <div className="legend-item">
                 <div className="legend-dot" style={{ backgroundColor: "var(--color-success)" }}></div>
-                Income (${data.totalIncome.toFixed(2)})
+                Income ({currencySymbol}{data.totalIncome.toFixed(2)})
               </div>
               <div className="legend-item">
                 <div className="legend-dot" style={{ backgroundColor: "var(--color-danger)" }}></div>
-                Expenses (${data.totalExpenses.toFixed(2)})
+                Expenses ({currencySymbol}{data.totalExpenses.toFixed(2)})
               </div>
             </div>
           </div>
@@ -156,7 +158,7 @@ export default function Reports() {
           <div style={{ marginTop: '40px' }}>
             <h3 style={{ fontSize: '15px', color: 'var(--color-text-secondary)', marginBottom: '16px' }}>Summary</h3>
             <p style={{ lineHeight: '1.6', fontSize: '14px' }}>
-              For the specific period selected, your business generated <strong>${data.totalIncome.toFixed(2)}</strong> in revenue and incurred <strong>${data.totalExpenses.toFixed(2)}</strong> in operational expenses.
+              For the specific period selected, your business generated <strong>{currencySymbol}{data.totalIncome.toFixed(2)}</strong> in revenue and incurred <strong>{currencySymbol}{data.totalExpenses.toFixed(2)}</strong> in operational expenses.
               {data.netProfit > 0 ? " You are currently running at a profit." : data.netProfit < 0 ? " You are operating at a loss." : " You are breaking even."}
             </p>
           </div>
@@ -175,7 +177,7 @@ export default function Reports() {
                     {expense.name}
                   </div>
                   <div className="expense-amount">
-                    ${expense.amount.toFixed(2)}
+                    {currencySymbol}{expense.amount.toFixed(2)}
                   </div>
                 </div>
               ))}

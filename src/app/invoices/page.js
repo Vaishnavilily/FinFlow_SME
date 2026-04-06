@@ -1,4 +1,5 @@
 "use client";
+import { useSettings } from "@/context/SettingsContext"
 import { useState, useEffect } from "react";
 import { Plus, Search, FileText, Pencil, Trash2 } from "lucide-react";
 import Modal from "@/components/ui/Modal";
@@ -10,6 +11,7 @@ export default function Invoices() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingInvoice, setEditingInvoice] = useState(null);
+  const { currencySymbol } = useSettings();
 
   const handleInvoiceSaved = (savedInvoice) => {
     if (editingInvoice) {
@@ -123,7 +125,7 @@ export default function Invoices() {
                   <td>{new Date(inv.issueDate).toLocaleDateString()}</td>
                   <td className="fw-600">{inv.invoiceNumber}</td>
                   <td>{inv.customerName}</td>
-                  <td className="fw-500">${inv.total.toFixed(2)}</td>
+                  <td className="fw-500">{currencySymbol}{inv.total.toFixed(2)}</td>
                   <td>
                     <span className={`status-badge status-${inv.status.toLowerCase()}`}>
                       {inv.status}

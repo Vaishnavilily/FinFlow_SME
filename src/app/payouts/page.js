@@ -1,4 +1,5 @@
 "use client";
+import { useSettings } from "@/context/SettingsContext";
 import { useState, useEffect } from "react";
 import { Send, Clock } from "lucide-react";
 import Modal from "@/components/ui/Modal";
@@ -10,6 +11,7 @@ export default function Payouts() {
   const [payouts, setPayouts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { currencySymbol } = useSettings();
 
   const fetchDashboardData = async () => {
     setLoading(true);
@@ -63,7 +65,7 @@ export default function Payouts() {
       <div className="balance-card">
         <div className="balance-info">
           <h2>FinFlow Available Balance</h2>
-          <div className="balance-amount">${loading ? "..." : balanceData.availableBalance.toFixed(2)}</div>
+          <div className="balance-amount">${loading ? "..." : `${currencySymbol}${balanceData.availableBalance.toFixed(2)}`}</div>
         </div>
         <div>
           <button 
@@ -101,7 +103,7 @@ export default function Payouts() {
               <tbody>
                 {payouts.map((p) => (
                   <tr key={p._id}>
-                    <td style={{fontWeight: 600}}>${p.amount.toFixed(2)}</td>
+                    <td style={{fontWeight: 600}}>{currencySymbol}{p.amount.toFixed(2)}</td>
                     <td>
                       <span className={`payout-status-badge ${getStatusBadgeClass(p.status)}`}>
                         {p.status}

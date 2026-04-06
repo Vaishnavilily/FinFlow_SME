@@ -1,4 +1,5 @@
 "use client";
+import { useSettings } from "@/context/SettingsContext";
 import { useState, useEffect } from "react";
 import { Check, Search, AlertCircle, RefreshCw } from "lucide-react";
 import "./page.css";
@@ -7,7 +8,7 @@ export default function Reconciliation() {
   const [bankFeed, setBankFeed] = useState([]);
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState(null);
-
+  const { currencySymbol } = useSettings();
   const fetchReconciliationData = async () => {
     setLoading(true);
     try {
@@ -96,7 +97,7 @@ export default function Reconciliation() {
                   <div className="recon-date">{new Date(item.date).toLocaleDateString()}</div>
                   <div className="recon-desc">{item.description}</div>
                   <div className={`recon-amount ${item.type === 'Income' ? 'amount-income' : 'amount-expense'}`}>
-                    {item.type === 'Income' ? '+' : ''}{item.amount < 0 ? '-$' : '$'}{Math.abs(item.amount).toFixed(2)}
+                    {item.type === 'Income' ? '+' : ''}{item.amount < 0 ? '-' : ''}{currencySymbol}{Math.abs(item.amount).toFixed(2)}
                   </div>
                 </div>
 
@@ -110,7 +111,7 @@ export default function Reconciliation() {
                       <div className="recon-date">{new Date(item.suggestedMatch.date).toLocaleDateString()}</div>
                       <div className="recon-desc">{item.suggestedMatch.description}</div>
                       <div className="recon-amount">
-                        ${item.suggestedMatch.amount.toFixed(2)}
+                        {currencySymbol}{item.suggestedMatch.amount.toFixed(2)}
                       </div>
                       
                       <div className="match-actions">

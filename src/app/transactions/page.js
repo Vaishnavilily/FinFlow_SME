@@ -1,4 +1,5 @@
 "use client";
+import { useSettings } from "@/context/SettingsContext";
 import { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import Modal from "@/components/ui/Modal";
@@ -11,7 +12,7 @@ export default function Transactions() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
-
+  const { currencySymbol } = useSettings();
   useEffect(() => {
     async function fetchTransactions() {
       try {
@@ -78,7 +79,7 @@ export default function Transactions() {
       key: "amount",
       render: (row) => (
         <span className={row.type === 'Income' ? 'amount-income' : 'amount-expense'}>
-          {row.type === 'Income' ? '+' : '-'}${row.amount.toFixed(2)}
+          {row.type === 'Income' ? '+' : '-'}{currencySymbol}{row.amount.toFixed(2)}
         </span>
       )
     },

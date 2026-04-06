@@ -1,4 +1,5 @@
 "use client";
+import { useSettings } from "@/context/SettingsContext";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Receipt, PiggyBank, Briefcase, TrendingUp, TrendingDown, Users } from "lucide-react";
@@ -6,6 +7,7 @@ import "./page.css";
 
 export default function Dashboard() {
   const router = useRouter();
+  const { currencySymbol } = useSettings();
   const [stats, setStats] = useState({
     invoices: 0,
     bills: 0,
@@ -73,7 +75,7 @@ export default function Dashboard() {
         <div className="wave-card stat-card" style={{ padding: '20px' }}>
           <div style={{ color: 'var(--color-text-secondary)', fontSize: '13px', textTransform: 'uppercase', fontWeight: 600, marginBottom: '8px' }}>Total Invoiced</div>
           <div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--color-text-main)' }}>
-            {stats.loading ? "..." : `$${stats.invoices.toFixed(2)}`}
+            {stats.loading ? "..." : `${currencySymbol}${stats.invoices.toFixed(2)}`}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '8px', color: 'var(--color-success)', fontSize: '14px' }}>
             <TrendingUp size={16} /> <span>Receivables</span>
@@ -83,7 +85,7 @@ export default function Dashboard() {
         <div className="wave-card stat-card" style={{ padding: '20px' }}>
           <div style={{ color: 'var(--color-text-secondary)', fontSize: '13px', textTransform: 'uppercase', fontWeight: 600, marginBottom: '8px' }}>Unpaid Bills</div>
           <div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--color-text-main)' }}>
-            {stats.loading ? "..." : `$${stats.bills.toFixed(2)}`}
+            {stats.loading ? "..." : `${currencySymbol}${stats.bills.toFixed(2)}`}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '8px', color: 'var(--color-danger)', fontSize: '14px' }}>
             <TrendingDown size={16} /> <span>Payables</span>
@@ -93,7 +95,7 @@ export default function Dashboard() {
         <div className="wave-card stat-card" style={{ padding: '20px' }}>
           <div style={{ color: 'var(--color-text-secondary)', fontSize: '13px', textTransform: 'uppercase', fontWeight: 600, marginBottom: '8px' }}>Net Cash Flow</div>
           <div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--color-text-main)' }}>
-            {stats.loading ? "..." : `$${stats.balance.toFixed(2)}`}
+            {stats.loading ? "..." : `${currencySymbol}${stats.balance.toFixed(2)}`}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '8px', color: 'var(--color-text-secondary)', fontSize: '14px' }}>
             <span>Available Balance</span>
