@@ -110,3 +110,33 @@ button {
   display: flex;
   flex-direction: column;
 }
+
+/* Action Buttons for CRUD */
+.action-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn:hover.edit-btn {
+  color: var(--color-primary);
+  background: var(--color-hover);
+}
+
+.action-btn:hover.delete-btn {
+  color: var(--color-danger);
+  background: #FFEBEA;
+}
+
+.actions-cell {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

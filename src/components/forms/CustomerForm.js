@@ -1,15 +1,15 @@
 import { useState } from "react";
 import "./forms.css";
 
-export default function CustomerForm({ onSuccess, onCancel }) {
+export default function CustomerForm({ onSuccess, onCancel, initialData }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    address: ""
+    name: initialData?.name || "",
+    email: initialData?.email || "",
+    phone: initialData?.phone || "",
+    address: initialData?.address || ""
   });
 
   const handleChange = (e) => {
@@ -31,8 +31,10 @@ export default function CustomerForm({ onSuccess, onCancel }) {
     };
 
     try {
-      const res = await fetch("/api/customers", {
-        method: "POST",
+      const url = initialData ? `/api/customers/${initialData._id}` : "/api/customers";
+      const method = initialData ? "PUT" : "POST";
+      const res = await fetch(url, {
+        method: method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
@@ -118,7 +120,7 @@ export default function CustomerForm({ onSuccess, onCancel }) {
           className="wave-btn-primary"
           disabled={loading}
         >
-          {loading ? "Saving..." : "Save Customer"}
+          {loading ? (initialData ? "Saving..." : "Saving...") : (initialData ? "Update Customer" : "Save Customer")}
         </button>
       </div>
     </form>

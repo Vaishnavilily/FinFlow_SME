@@ -1,14 +1,14 @@
 import { useState } from "react";
 import "./forms.css";
 
-export default function EstimateForm({ onSuccess, onCancel }) {
+export default function EstimateForm({ onSuccess, onCancel, initialData }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const [formData, setFormData] = useState({
-    estimateNumber: `EST-${Math.floor(1000 + Math.random() * 9000)}`,
-    customerName: "",
-    amount: "",
+    estimateNumber: initialData?.estimateNumber || `EST-${Math.floor(1000 + Math.random() * 9000)}`,
+    customerName: initialData?.customerName || "",
+    amount: initialData?.total || "",
   });
 
   const handleChange = (e) => {
@@ -36,8 +36,10 @@ export default function EstimateForm({ onSuccess, onCancel }) {
     };
 
     try {
-      const res = await fetch("/api/estimates", {
-        method: "POST",
+      const url = initialData ? `/api/estimates/${initialData._id}` : "/api/estimates";
+      const method = initialData ? "PUT" : "POST";
+      const res = await fetch(url, {
+        method: method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
@@ -113,7 +115,7 @@ export default function EstimateForm({ onSuccess, onCancel }) {
           className="wave-btn-primary"
           disabled={loading}
         >
-          {loading ? "Creating..." : "Create Estimate"}
+          {loading ? (initialData ? "Updating..." : "Creating...") : (initialData ? "Update Estimate" : "Create Estimate")}
         </button>
       </div>
     </form>

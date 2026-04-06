@@ -1,14 +1,14 @@
 import { useState } from "react";
 import "./forms.css";
 
-export default function InvoiceForm({ onSuccess, onCancel }) {
+export default function InvoiceForm({ onSuccess, onCancel, initialData }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const [formData, setFormData] = useState({
-    invoiceNumber: `INV-${Math.floor(1000 + Math.random() * 9000)}`,
-    customerName: "",
-    amount: "",
+    invoiceNumber: initialData?.invoiceNumber || `INV-${Math.floor(1000 + Math.random() * 9000)}`,
+    customerName: initialData?.customerName || "",
+    amount: initialData?.total || "",
   });
 
   const handleChange = (e) => {
@@ -37,8 +37,10 @@ export default function InvoiceForm({ onSuccess, onCancel }) {
     };
 
     try {
-      const res = await fetch("/api/invoices", {
-        method: "POST",
+      const url = initialData ? `/api/invoices/${initialData._id}` : "/api/invoices";
+      const method = initialData ? "PUT" : "POST";
+      const res = await fetch(url, {
+        method: method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
@@ -115,7 +117,7 @@ export default function InvoiceForm({ onSuccess, onCancel }) {
           className="wave-btn-primary"
           disabled={loading}
         >
-          {loading ? "Creating..." : "Create Invoice"}
+          {loading ? (initialData ? "Updating..." : "Creating...") : (initialData ? "Update Invoice" : "Create Invoice")}
         </button>
       </div>
     </form>

@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 import Modal from "@/components/ui/Modal";
 import DataTable from "@/components/ui/DataTable";
 import VendorForm from "@/components/forms/VendorForm";
@@ -10,6 +10,7 @@ export default function Vendors() {
   const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingVendor, setEditingVendor] = useState(null);
 
   useEffect(() => {
     async function fetchVendors() {
@@ -28,9 +29,32 @@ export default function Vendors() {
     fetchVendors();
   }, []);
 
-  const handleVendorCreated = (newVendor) => {
-    setVendors([newVendor, ...vendors]);
+  const handleVendorSaved = (savedVendor) => {
+    if (editingVendor) {
+      setVendors(vendors.map((v) => v._id === savedVendor._id ? savedVendor : v));
+    } else {
+      setVendors([savedVendor, ...vendors]);
+    }
     setIsModalOpen(false);
+    setEditingVendor(null);
+  };
+
+  const handleEdit = (vendor) => {
+    setEditingVendor(vendor);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this vendor?")) {
+      try {
+        const res = await fetch(`/api/vendors/${id}`, { method: "DELETE" });
+        if (res.ok) {
+          setVendors(vendors.filter((v) => v._id !== id));
+        }
+      } catch (error) {
+        console.error("Failed to delete vendor");
+      }
+    }
   };
 
   const columns = [
@@ -65,6 +89,21 @@ export default function Vendors() {
           {row.status || 'Active'}
         </span>
       )
+    },
+    {
+      label: "Actions",
+      key: "actions",
+      className: "actions-cell",
+      render: (row) => (
+        <>
+          <button className="action-btn edit-btn" onClick={() => handleEdit(row)} title="Edit">
+            <Pencil size={16} />
+          </button>
+          <button className="action-btn delete-btn" onClick={() => handleDelete(row._id)} title="Delete">
+            <Trash2 size={16} />
+          </button>
+        </>
+      )
     }
   ];
 
@@ -92,12 +131,13 @@ export default function Vendors() {
 
       <Modal 
         isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)}
-        title="Add New Vendor"
+        onClose={() => { setIsModalOpen(false); setEditingVendor(null); }}
+        title={editingVendor ? "Edit Vendor" : "Add New Vendor"}
       >
         <VendorForm 
-          onSuccess={handleVendorCreated} 
-          onCancel={() => setIsModalOpen(false)} 
+          initialData={editingVendor}
+          onSuccess={handleVendorSaved} 
+          onCancel={() => { setIsModalOpen(false); setEditingVendor(null); }} 
         />
       </Modal>
     </div>

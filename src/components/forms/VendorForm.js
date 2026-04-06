@@ -1,15 +1,15 @@
 import { useState } from "react";
 import "./forms.css";
 
-export default function VendorForm({ onSuccess, onCancel }) {
+export default function VendorForm({ onSuccess, onCancel, initialData }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    category: ""
+    name: initialData?.name || "",
+    email: initialData?.email || "",
+    phone: initialData?.phone || "",
+    category: initialData?.category || ""
   });
 
   const handleChange = (e) => {
@@ -31,8 +31,10 @@ export default function VendorForm({ onSuccess, onCancel }) {
     };
 
     try {
-      const res = await fetch("/api/vendors", {
-        method: "POST",
+      const url = initialData ? `/api/vendors/${initialData._id}` : "/api/vendors";
+      const method = initialData ? "PUT" : "POST";
+      const res = await fetch(url, {
+        method: method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
@@ -119,7 +121,7 @@ export default function VendorForm({ onSuccess, onCancel }) {
           className="wave-btn-primary"
           disabled={loading}
         >
-          {loading ? "Saving..." : "Save Vendor"}
+          {loading ? (initialData ? "Saving..." : "Saving...") : (initialData ? "Update Vendor" : "Save Vendor")}
         </button>
       </div>
     </form>

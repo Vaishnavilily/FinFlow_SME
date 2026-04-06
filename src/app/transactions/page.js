@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 import Modal from "@/components/ui/Modal";
 import DataTable from "@/components/ui/DataTable";
 import TransactionForm from "@/components/forms/TransactionForm";
@@ -10,6 +10,7 @@ export default function Transactions() {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState(null);
 
   useEffect(() => {
     async function fetchTransactions() {
@@ -28,9 +29,32 @@ export default function Transactions() {
     fetchTransactions();
   }, []);
 
-  const handleTransactionCreated = (newTransaction) => {
-    setTransactions([newTransaction, ...transactions]);
+  const handleTransactionSaved = (savedTransaction) => {
+    if (editingTransaction) {
+      setTransactions(transactions.map((t) => t._id === savedTransaction._id ? savedTransaction : t));
+    } else {
+      setTransactions([savedTransaction, ...transactions]);
+    }
     setIsModalOpen(false);
+    setEditingTransaction(null);
+  };
+
+  const handleEdit = (transaction) => {
+    setEditingTransaction(transaction);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this transaction?")) {
+      try {
+        const res = await fetch(`/api/transactions/${id}`, { method: "DELETE" });
+        if (res.ok) {
+          setTransactions(transactions.filter((t) => t._id !== id));
+        }
+      } catch (error) {
+        console.error("Failed to delete transaction");
+      }
+    }
   };
 
   const columns = [
@@ -66,6 +90,21 @@ export default function Transactions() {
           {row.status || 'Completed'}
         </span>
       )
+    },
+    {
+      label: "Actions",
+      key: "actions",
+      className: "actions-cell",
+      render: (row) => (
+        <>
+          <button className="action-btn edit-btn" onClick={() => handleEdit(row)} title="Edit">
+            <Pencil size={16} />
+          </button>
+          <button className="action-btn delete-btn" onClick={() => handleDelete(row._id)} title="Delete">
+            <Trash2 size={16} />
+          </button>
+        </>
+      )
     }
   ];
 
@@ -93,12 +132,13 @@ export default function Transactions() {
 
       <Modal 
         isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)}
-        title="Add Income/Expense"
+        onClose={() => { setIsModalOpen(false); setEditingTransaction(null); }}
+        title={editingTransaction ? "Edit Transaction" : "Add Income/Expense"}
       >
         <TransactionForm 
-          onSuccess={handleTransactionCreated} 
-          onCancel={() => setIsModalOpen(false)} 
+          initialData={editingTransaction}
+          onSuccess={handleTransactionSaved} 
+          onCancel={() => { setIsModalOpen(false); setEditingTransaction(null); }} 
         />
       </Modal>
     </div>

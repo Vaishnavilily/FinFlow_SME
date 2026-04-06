@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 import Modal from "@/components/ui/Modal";
 import DataTable from "@/components/ui/DataTable";
 import AccountForm from "@/components/forms/AccountForm";
@@ -10,6 +10,7 @@ export default function ChartOfAccounts() {
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingAccount, setEditingAccount] = useState(null);
 
   useEffect(() => {
     async function fetchAccounts() {
@@ -28,9 +29,34 @@ export default function ChartOfAccounts() {
     fetchAccounts();
   }, []);
 
-  const handleAccountCreated = (newAccount) => {
-    setAccounts([...accounts, newAccount].sort((a, b) => a.code.localeCompare(b.code)));
+  const handleAccountSaved = (savedAccount) => {
+    let freshAccounts = [];
+    if (editingAccount) {
+      freshAccounts = accounts.map((a) => a._id === savedAccount._id ? savedAccount : a);
+    } else {
+      freshAccounts = [...accounts, savedAccount];
+    }
+    setAccounts(freshAccounts.sort((a, b) => a.code.localeCompare(b.code)));
     setIsModalOpen(false);
+    setEditingAccount(null);
+  };
+
+  const handleEdit = (account) => {
+    setEditingAccount(account);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this account?")) {
+      try {
+        const res = await fetch(`/api/accounts/${id}`, { method: "DELETE" });
+        if (res.ok) {
+          setAccounts(accounts.filter((a) => a._id !== id));
+        }
+      } catch (error) {
+        console.error("Failed to delete account");
+      }
+    }
   };
 
   const columns = [
@@ -58,6 +84,21 @@ export default function ChartOfAccounts() {
       key: "balance",
       className: "fw-600",
       render: (row) => `$${(row.balance || 0).toFixed(2)}`
+    },
+    {
+      label: "Actions",
+      key: "actions",
+      className: "actions-cell",
+      render: (row) => (
+        <>
+          <button className="action-btn edit-btn" onClick={() => handleEdit(row)} title="Edit">
+            <Pencil size={16} />
+          </button>
+          <button className="action-btn delete-btn" onClick={() => handleDelete(row._id)} title="Delete">
+            <Trash2 size={16} />
+          </button>
+        </>
+      )
     }
   ];
 
@@ -85,12 +126,13 @@ export default function ChartOfAccounts() {
 
       <Modal 
         isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)}
-        title="Add New Account"
+        onClose={() => { setIsModalOpen(false); setEditingAccount(null); }}
+        title={editingAccount ? "Edit Account" : "Add New Account"}
       >
         <AccountForm 
-          onSuccess={handleAccountCreated} 
-          onCancel={() => setIsModalOpen(false)} 
+          initialData={editingAccount}
+          onSuccess={handleAccountSaved} 
+          onCancel={() => { setIsModalOpen(false); setEditingAccount(null); }} 
         />
       </Modal>
     </div>

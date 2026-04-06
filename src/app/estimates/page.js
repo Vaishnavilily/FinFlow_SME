@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 import Modal from "@/components/ui/Modal";
 import DataTable from "@/components/ui/DataTable";
 import EstimateForm from "@/components/forms/EstimateForm";
@@ -10,6 +10,7 @@ export default function Estimates() {
   const [estimates, setEstimates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingEstimate, setEditingEstimate] = useState(null);
 
   useEffect(() => {
     async function fetchEstimates() {
@@ -28,9 +29,32 @@ export default function Estimates() {
     fetchEstimates();
   }, []);
 
-  const handleEstimateCreated = (newEstimate) => {
-    setEstimates([newEstimate, ...estimates]);
+  const handleEstimateSaved = (savedEstimate) => {
+    if (editingEstimate) {
+      setEstimates(estimates.map((e) => e._id === savedEstimate._id ? savedEstimate : e));
+    } else {
+      setEstimates([savedEstimate, ...estimates]);
+    }
     setIsModalOpen(false);
+    setEditingEstimate(null);
+  };
+
+  const handleEdit = (estimate) => {
+    setEditingEstimate(estimate);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this estimate?")) {
+      try {
+        const res = await fetch(`/api/estimates/${id}`, { method: "DELETE" });
+        if (res.ok) {
+          setEstimates(estimates.filter((e) => e._id !== id));
+        }
+      } catch (error) {
+        console.error("Failed to delete estimate");
+      }
+    }
   };
 
   const columns = [
@@ -62,6 +86,21 @@ export default function Estimates() {
           {row.status}
         </span>
       )
+    },
+    {
+      label: "Actions",
+      key: "actions",
+      className: "actions-cell",
+      render: (row) => (
+        <>
+          <button className="action-btn edit-btn" onClick={() => handleEdit(row)} title="Edit">
+            <Pencil size={16} />
+          </button>
+          <button className="action-btn delete-btn" onClick={() => handleDelete(row._id)} title="Delete">
+            <Trash2 size={16} />
+          </button>
+        </>
+      )
     }
   ];
 
@@ -89,12 +128,13 @@ export default function Estimates() {
 
       <Modal 
         isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)}
-        title="Create New Estimate"
+        onClose={() => { setIsModalOpen(false); setEditingEstimate(null); }}
+        title={editingEstimate ? "Edit Estimate" : "Create New Estimate"}
       >
         <EstimateForm 
-          onSuccess={handleEstimateCreated} 
-          onCancel={() => setIsModalOpen(false)} 
+          initialData={editingEstimate}
+          onSuccess={handleEstimateSaved} 
+          onCancel={() => { setIsModalOpen(false); setEditingEstimate(null); }} 
         />
       </Modal>
     </div>

@@ -1,16 +1,16 @@
 import { useState } from "react";
 import "./forms.css";
 
-export default function AccountForm({ onSuccess, onCancel }) {
+export default function AccountForm({ onSuccess, onCancel, initialData }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const [formData, setFormData] = useState({
-    code: "",
-    name: "",
-    type: "Asset",
-    balance: "",
-    description: ""
+    code: initialData?.code || "",
+    name: initialData?.name || "",
+    type: initialData?.type || "Asset",
+    balance: initialData?.balance || "",
+    description: initialData?.description || ""
   });
 
   const handleChange = (e) => {
@@ -31,8 +31,10 @@ export default function AccountForm({ onSuccess, onCancel }) {
     };
 
     try {
-      const res = await fetch("/api/accounts", {
-        method: "POST",
+      const url = initialData ? `/api/accounts/${initialData._id}` : "/api/accounts";
+      const method = initialData ? "PUT" : "POST";
+      const res = await fetch(url, {
+        method: method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
@@ -124,7 +126,7 @@ export default function AccountForm({ onSuccess, onCancel }) {
           className="wave-btn-primary"
           disabled={loading}
         >
-          {loading ? "Adding..." : "Add Account"}
+          {loading ? (initialData ? "Updating..." : "Adding...") : (initialData ? "Update Account" : "Add Account")}
         </button>
       </div>
     </form>

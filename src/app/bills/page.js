@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 import Modal from "@/components/ui/Modal";
 import DataTable from "@/components/ui/DataTable";
 import BillForm from "@/components/forms/BillForm";
@@ -10,6 +10,7 @@ export default function Bills() {
   const [bills, setBills] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingBill, setEditingBill] = useState(null);
 
   useEffect(() => {
     async function fetchBills() {
@@ -28,9 +29,32 @@ export default function Bills() {
     fetchBills();
   }, []);
 
-  const handleBillCreated = (newBill) => {
-    setBills([newBill, ...bills]);
+  const handleBillSaved = (savedBill) => {
+    if (editingBill) {
+      setBills(bills.map((b) => b._id === savedBill._id ? savedBill : b));
+    } else {
+      setBills([savedBill, ...bills]);
+    }
     setIsModalOpen(false);
+    setEditingBill(null);
+  };
+
+  const handleEdit = (bill) => {
+    setEditingBill(bill);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this bill?")) {
+      try {
+        const res = await fetch(`/api/bills/${id}`, { method: "DELETE" });
+        if (res.ok) {
+          setBills(bills.filter((b) => b._id !== id));
+        }
+      } catch (error) {
+        console.error("Failed to delete bill");
+      }
+    }
   };
 
   const columns = [
@@ -62,6 +86,21 @@ export default function Bills() {
           {row.status}
         </span>
       )
+    },
+    {
+      label: "Actions",
+      key: "actions",
+      className: "actions-cell",
+      render: (row) => (
+        <>
+          <button className="action-btn edit-btn" onClick={() => handleEdit(row)} title="Edit">
+            <Pencil size={16} />
+          </button>
+          <button className="action-btn delete-btn" onClick={() => handleDelete(row._id)} title="Delete">
+            <Trash2 size={16} />
+          </button>
+        </>
+      )
     }
   ];
 
@@ -89,12 +128,13 @@ export default function Bills() {
 
       <Modal 
         isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)}
-        title="Create New Bill"
+        onClose={() => { setIsModalOpen(false); setEditingBill(null); }}
+        title={editingBill ? "Edit Bill" : "Create New Bill"}
       >
         <BillForm 
-          onSuccess={handleBillCreated} 
-          onCancel={() => setIsModalOpen(false)} 
+          initialData={editingBill}
+          onSuccess={handleBillSaved} 
+          onCancel={() => { setIsModalOpen(false); setEditingBill(null); }} 
         />
       </Modal>
     </div>

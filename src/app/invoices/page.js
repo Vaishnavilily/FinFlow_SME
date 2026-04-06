@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Plus, Search, FileText } from "lucide-react";
+import { Plus, Search, FileText, Pencil, Trash2 } from "lucide-react";
 import Modal from "@/components/ui/Modal";
 import InvoiceForm from "@/components/forms/InvoiceForm";
 import "./invoices.css";
@@ -9,10 +9,38 @@ export default function Invoices() {
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingInvoice, setEditingInvoice] = useState(null);
 
-  const handleInvoiceCreated = (newInvoice) => {
-    setInvoices([newInvoice, ...invoices]);
+  const handleInvoiceSaved = (savedInvoice) => {
+    if (editingInvoice) {
+      setInvoices(invoices.map((inv) => inv._id === savedInvoice._id ? savedInvoice : inv));
+    } else {
+      setInvoices([savedInvoice, ...invoices]);
+    }
     setIsModalOpen(false);
+    setEditingInvoice(null);
+  };
+
+  const handleEdit = (inv) => {
+    if (inv.status === 'Paid') {
+      alert("Cannot edit a paid invoice.");
+      return;
+    }
+    setEditingInvoice(inv);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this invoice?")) {
+      try {
+        const res = await fetch(`/api/invoices/${id}`, { method: "DELETE" });
+        if (res.ok) {
+          setInvoices(invoices.filter((inv) => inv._id !== id));
+        }
+      } catch (error) {
+        console.error("Failed to delete invoice");
+      }
+    }
   };
 
   useEffect(() => {
@@ -86,6 +114,7 @@ export default function Invoices() {
                 <th>Customer Name</th>
                 <th>Amount</th>
                 <th>Status</th>
+                <th style={{ textAlign: "right" }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -100,6 +129,14 @@ export default function Invoices() {
                       {inv.status}
                     </span>
                   </td>
+                  <td className="actions-cell">
+                    <button className="action-btn edit-btn" onClick={() => handleEdit(inv)} title="Edit">
+                      <Pencil size={16} />
+                    </button>
+                    <button className="action-btn delete-btn" onClick={() => handleDelete(inv._id)} title="Delete">
+                      <Trash2 size={16} />
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -109,12 +146,13 @@ export default function Invoices() {
 
       <Modal 
         isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)}
-        title="Create New Invoice"
+        onClose={() => { setIsModalOpen(false); setEditingInvoice(null); }}
+        title={editingInvoice ? "Edit Invoice" : "Create New Invoice"}
       >
         <InvoiceForm 
-          onSuccess={handleInvoiceCreated} 
-          onCancel={() => setIsModalOpen(false)} 
+          initialData={editingInvoice}
+          onSuccess={handleInvoiceSaved} 
+          onCancel={() => { setIsModalOpen(false); setEditingInvoice(null); }} 
         />
       </Modal>
     </div>

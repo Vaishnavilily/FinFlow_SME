@@ -1,14 +1,14 @@
 import { useState } from "react";
 import "./forms.css";
 
-export default function BillForm({ onSuccess, onCancel }) {
+export default function BillForm({ onSuccess, onCancel, initialData }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const [formData, setFormData] = useState({
-    billNumber: `BILL-${Math.floor(1000 + Math.random() * 9000)}`,
-    vendorName: "",
-    amount: "",
+    billNumber: initialData?.billNumber || `BILL-${Math.floor(1000 + Math.random() * 9000)}`,
+    vendorName: initialData?.vendorName || "",
+    amount: initialData?.total || "",
   });
 
   const handleChange = (e) => {
@@ -36,8 +36,10 @@ export default function BillForm({ onSuccess, onCancel }) {
     };
 
     try {
-      const res = await fetch("/api/bills", {
-        method: "POST",
+      const url = initialData ? `/api/bills/${initialData._id}` : "/api/bills";
+      const method = initialData ? "PUT" : "POST";
+      const res = await fetch(url, {
+        method: method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
@@ -114,7 +116,7 @@ export default function BillForm({ onSuccess, onCancel }) {
           className="wave-btn-primary"
           disabled={loading}
         >
-          {loading ? "Creating..." : "Create Bill"}
+          {loading ? (initialData ? "Updating..." : "Creating...") : (initialData ? "Update Bill" : "Create Bill")}
         </button>
       </div>
     </form>

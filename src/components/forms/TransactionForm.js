@@ -1,16 +1,16 @@
 import { useState } from "react";
 import "./forms.css";
 
-export default function TransactionForm({ onSuccess, onCancel }) {
+export default function TransactionForm({ onSuccess, onCancel, initialData }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const [formData, setFormData] = useState({
-    date: new Date().toISOString().split('T')[0],
-    description: "",
-    amount: "",
-    type: "Expense",
-    category: "General"
+    date: initialData?.date ? new Date(initialData.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+    description: initialData?.description || "",
+    amount: initialData?.amount || "",
+    type: initialData?.type || "Expense",
+    category: initialData?.category || "General"
   });
 
   const handleChange = (e) => {
@@ -39,8 +39,10 @@ export default function TransactionForm({ onSuccess, onCancel }) {
     };
 
     try {
-      const res = await fetch("/api/transactions", {
-        method: "POST",
+      const url = initialData ? `/api/transactions/${initialData._id}` : "/api/transactions";
+      const method = initialData ? "PUT" : "POST";
+      const res = await fetch(url, {
+        method: method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
@@ -143,7 +145,7 @@ export default function TransactionForm({ onSuccess, onCancel }) {
           className="wave-btn-primary"
           disabled={loading}
         >
-          {loading ? "Adding..." : "Add Transaction"}
+          {loading ? (initialData ? "Updating..." : "Adding...") : (initialData ? "Update Transaction" : "Add Transaction")}
         </button>
       </div>
     </form>

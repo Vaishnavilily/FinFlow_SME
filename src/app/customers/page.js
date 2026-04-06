@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 import Modal from "@/components/ui/Modal";
 import DataTable from "@/components/ui/DataTable";
 import CustomerForm from "@/components/forms/CustomerForm";
@@ -10,6 +10,7 @@ export default function Customers() {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingCustomer, setEditingCustomer] = useState(null);
 
   useEffect(() => {
     async function fetchCustomers() {
@@ -28,9 +29,32 @@ export default function Customers() {
     fetchCustomers();
   }, []);
 
-  const handleCustomerCreated = (newCustomer) => {
-    setCustomers([newCustomer, ...customers]);
+  const handleCustomerSaved = (savedCustomer) => {
+    if (editingCustomer) {
+      setCustomers(customers.map((c) => c._id === savedCustomer._id ? savedCustomer : c));
+    } else {
+      setCustomers([savedCustomer, ...customers]);
+    }
     setIsModalOpen(false);
+    setEditingCustomer(null);
+  };
+
+  const handleEdit = (customer) => {
+    setEditingCustomer(customer);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this customer?")) {
+      try {
+        const res = await fetch(`/api/customers/${id}`, { method: "DELETE" });
+        if (res.ok) {
+          setCustomers(customers.filter((c) => c._id !== id));
+        }
+      } catch (error) {
+        console.error("Failed to delete customer");
+      }
+    }
   };
 
   const columns = [
@@ -63,6 +87,21 @@ export default function Customers() {
           {row.status || 'Active'}
         </span>
       )
+    },
+    {
+      label: "Actions",
+      key: "actions",
+      className: "actions-cell",
+      render: (row) => (
+        <>
+          <button className="action-btn edit-btn" onClick={() => handleEdit(row)} title="Edit">
+            <Pencil size={16} />
+          </button>
+          <button className="action-btn delete-btn" onClick={() => handleDelete(row._id)} title="Delete">
+            <Trash2 size={16} />
+          </button>
+        </>
+      )
     }
   ];
 
@@ -90,12 +129,13 @@ export default function Customers() {
 
       <Modal 
         isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)}
-        title="Add New Customer"
+        onClose={() => { setIsModalOpen(false); setEditingCustomer(null); }}
+        title={editingCustomer ? "Edit Customer" : "Add New Customer"}
       >
         <CustomerForm 
-          onSuccess={handleCustomerCreated} 
-          onCancel={() => setIsModalOpen(false)} 
+          initialData={editingCustomer}
+          onSuccess={handleCustomerSaved} 
+          onCancel={() => { setIsModalOpen(false); setEditingCustomer(null); }} 
         />
       </Modal>
     </div>
