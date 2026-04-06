@@ -2,11 +2,11 @@ import mongoose from "mongoose";
 
 const TransactionSchema = new mongoose.Schema({
   date: { type: Date, required: true, default: Date.now },
-  description: { type: String, required: true },
-  amount: { type: Number, required: true },
+  description: { type: String, required: true, trim: true },
+  amount: { type: Number, required: true, min: 0 },
   type: { type: String, enum: ['Income', 'Expense'], required: true },
-  category: { type: String, default: 'Uncategorized' },
-  reference: { type: String },
+  category: { type: String, default: 'Uncategorized', trim: true },
+  reference: { type: String, trim: true },
   status: { type: String, enum: ['Completed', 'Pending', 'Failed'], default: 'Completed' },
   isReconciled: { type: Boolean, default: false }
 }, { timestamps: true });

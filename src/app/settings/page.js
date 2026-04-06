@@ -72,7 +72,7 @@ export default function Settings() {
     <div className="settings-container">
       <header className="settings-header">
         <h1>Company Settings</h1>
-        <p className="subtitle">Manage your organization's preferences and profile.</p>
+        <p className="subtitle">Manage your organization&apos;s preferences and profile.</p>
       </header>
 
       <div className="wave-card settings-card">

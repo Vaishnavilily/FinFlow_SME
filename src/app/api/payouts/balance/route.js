@@ -9,11 +9,11 @@ export async function GET() {
     
     // 1. Sum up all incoming funds (Paid Invoices)
     const paidInvoices = await Invoice.find({ status: "Paid" });
-    const totalCollected = paidInvoices.reduce((sum, inv) => sum + inv.total, 0);
+    const totalCollected = paidInvoices.reduce((sum, inv) => sum + (Number(inv.total) || 0), 0);
 
     // 2. Sum up all outgoing funds (Payouts already requested)
     const allPayouts = await Payout.find({});
-    const totalPaidOut = allPayouts.reduce((sum, payout) => sum + payout.amount, 0);
+    const totalPaidOut = allPayouts.reduce((sum, payout) => sum + (Number(payout.amount) || 0), 0);
 
     // 3. Available to Sweep
     const availableBalance = Math.max(0, totalCollected - totalPaidOut);

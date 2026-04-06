@@ -11,7 +11,7 @@ export async function GET() {
       isReconciled: { $ne: true } 
     }).sort({ date: -1 }).lean();
 
-    // 2. Generate the "Mock Bank Feed"
+    // 2. Build bank feed solely from real internal transactions
     const bankFeed = [];
     
     // Create perfect mock bank items based on real internal transactions
@@ -29,27 +29,6 @@ export async function GET() {
       });
     });
 
-    // Generate a couple of completely random, unmatched mock bank items
-    const today = new Date();
-    bankFeed.push({
-      id: `bank-random-1`,
-      date: new Date(today.getTime() - 86400000 * 2), // 2 days ago
-      description: "MONTHLY ACCOUNT FEE",
-      amount: -12.50,
-      type: "Expense",
-      suggestedMatch: null
-    });
-
-    bankFeed.push({
-      id: `bank-random-2`,
-      date: new Date(today.getTime() - 86400000 * 5), // 5 days ago
-      description: "ACH TRANSFER IN - STRIPE",
-      amount: 450.00,
-      type: "Income",
-      suggestedMatch: null
-    });
-
-    // Shuffle the bank feed to make it look realistic
     bankFeed.sort((a, b) => new Date(b.date) - new Date(a.date));
 
     // Send back both the structured feed (with matches) and the raw pending internal pool (useful for manual matching UI)

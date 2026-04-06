@@ -86,7 +86,7 @@ export default function Payouts() {
           <p style={{color: "var(--color-text-secondary)"}}>Loading history...</p>
         ) : payouts.length === 0 ? (
           <div className="wave-card" style={{padding: "40px 20px", textAlign: "center"}}>
-            <p style={{color: "var(--color-text-secondary)"}}>You haven't requested any payouts yet. Collect paid invoices to grow your balance.</p>
+            <p style={{color: "var(--color-text-secondary)"}}>You haven&apos;t requested any payouts yet. Collect paid invoices to grow your balance.</p>
           </div>
         ) : (
           <div className="wave-card" style={{padding: 0}}>

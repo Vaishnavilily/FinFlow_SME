@@ -8,11 +8,11 @@ const BillItemSchema = new mongoose.Schema({
 });
 
 const BillSchema = new mongoose.Schema({
-  billNumber: { type: String, required: true, unique: true },
-  vendorName: { type: String, required: true },
+  billNumber: { type: String, required: true, unique: true, trim: true },
+  vendorName: { type: String, required: true, trim: true },
   issueDate: { type: Date, required: true, default: Date.now },
   dueDate: { type: Date },
-  items: [BillItemSchema],
+  items: { type: [BillItemSchema], default: [] },
   subtotal: { type: Number, required: true, min: 0 },
   taxRate: { type: Number, default: 0 },
   taxAmount: { type: Number, default: 0 },
