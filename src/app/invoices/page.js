@@ -1,11 +1,19 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Plus, Search, FileText } from "lucide-react";
+import Modal from "@/components/ui/Modal";
+import InvoiceForm from "@/components/forms/InvoiceForm";
 import "./invoices.css";
 
 export default function Invoices() {
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleInvoiceCreated = (newInvoice) => {
+    setInvoices([newInvoice, ...invoices]);
+    setIsModalOpen(false);
+  };
 
   useEffect(() => {
     async function fetchInvoices() {
@@ -31,7 +39,10 @@ export default function Invoices() {
           <h1>Invoices</h1>
           <p className="subtitle">Manage and track your customer invoices.</p>
         </div>
-        <button className="wave-btn-primary create-btn">
+        <button 
+          className="wave-btn-primary create-btn"
+          onClick={() => setIsModalOpen(true)}
+        >
           <Plus size={16} /> Create an Invoice
         </button>
       </header>
@@ -59,7 +70,10 @@ export default function Invoices() {
             </div>
             <h3>No invoices yet</h3>
             <p>Create your first invoice to get paid faster.</p>
-            <button className="wave-btn-secondary">
+            <button 
+              className="wave-btn-secondary"
+              onClick={() => setIsModalOpen(true)}
+            >
               Create an Invoice
             </button>
           </div>
@@ -92,6 +106,17 @@ export default function Invoices() {
           </table>
         )}
       </div>
+
+      <Modal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)}
+        title="Create New Invoice"
+      >
+        <InvoiceForm 
+          onSuccess={handleInvoiceCreated} 
+          onCancel={() => setIsModalOpen(false)} 
+        />
+      </Modal>
     </div>
   );
 }
