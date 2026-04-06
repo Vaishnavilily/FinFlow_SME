@@ -10,7 +10,7 @@ export default function Settings() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const { theme, toggleTheme } = useContext(ThemeContext);
-  
+
   const [formData, setFormData] = useState({
     companyName: "",
     email: "",
@@ -18,15 +18,16 @@ export default function Settings() {
     timezone: "UTC",
     theme: "Light"
   });
-  
-  const handleChange = (e) => {
-  const { name, value } = e.target;
-  setFormData({ ...formData, [name]: value });
 
-  if (name === "theme") {
-    toggleTheme(value.toLowerCase()); // "Light" → "light", "Dark" → "dark"
-  }
-};
+  // ✅ Single handleChange that also triggers theme toggle
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
+    if (name === "theme") {
+      toggleTheme(value.toLowerCase()); // "Light" → "light", "Dark" → "dark"
+    }
+  };
 
   useEffect(() => {
     async function fetchSettings() {
@@ -35,8 +36,10 @@ export default function Settings() {
         const json = await res.json();
         if (json.success && json.data) {
           setFormData(json.data);
+
+          // ✅ Apply theme immediately when settings are loaded
           if (json.data.theme) {
-          toggleTheme(json.data.theme.toLowerCase());
+            toggleTheme(json.data.theme.toLowerCase());
           }
         }
       } catch (error) {
@@ -47,10 +50,6 @@ export default function Settings() {
     }
     fetchSettings();
   }, []);
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -65,11 +64,11 @@ export default function Settings() {
         body: JSON.stringify(formData)
       });
       const data = await res.json();
-      
+
       if (!res.ok || !data.success) {
         throw new Error(data.error || "Failed to update settings");
       }
-      
+
       setMessage("Settings saved successfully.");
       setTimeout(() => setMessage(""), 3000);
     } catch (err) {
@@ -92,7 +91,7 @@ export default function Settings() {
 
       <div className="wave-card settings-card">
         <h2 className="settings-section-title">General Preferences</h2>
-        
+
         {message && <div className="settings-success">{message}</div>}
         {error && <div className="form-error" style={{marginBottom: '20px'}}>{error}</div>}
 
@@ -125,10 +124,10 @@ export default function Settings() {
           <div className="form-row">
             <div className="form-group">
               <label>Base Currency</label>
-              <select 
-                name="currency" 
-                className="form-control" 
-                value={formData.currency} 
+              <select
+                name="currency"
+                className="form-control"
+                value={formData.currency}
                 onChange={handleChange}
               >
                 <option value="USD">USD ($)</option>
@@ -141,10 +140,10 @@ export default function Settings() {
             </div>
             <div className="form-group">
               <label>Timezone</label>
-              <select 
-                name="timezone" 
-                className="form-control" 
-                value={formData.timezone} 
+              <select
+                name="timezone"
+                className="form-control"
+                value={formData.timezone}
                 onChange={handleChange}
               >
                 <option value="UTC">UTC</option>
@@ -158,10 +157,10 @@ export default function Settings() {
 
           <div className="form-group" style={{maxWidth: '50%'}}>
             <label>App Theme</label>
-            <select 
-              name="theme" 
-              className="form-control" 
-              value={formData.theme} 
+            <select
+              name="theme"
+              className="form-control"
+              value={formData.theme}
               onChange={handleChange}
             >
               <option value="Light">Light</option>
@@ -171,8 +170,8 @@ export default function Settings() {
           </div>
 
           <div className="form-actions">
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="wave-btn-primary"
               disabled={saving}
             >
