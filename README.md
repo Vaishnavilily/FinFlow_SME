@@ -16,6 +16,25 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## AI Assistant (Gemini)
+
+The SME app includes an AI Assistant at `/ai-assistant`.
+
+### Setup
+
+Create `finflow_sme/.env.local`:
+
+```bash
+GEMINI_API_KEY=your_key_here
+```
+
+Restart the dev server after setting env vars.
+
+### Notes
+
+- The UI falls back to a local demo mode if `GEMINI_API_KEY` is missing.
+- Server route: `src/app/api/ai/route.js`
+
 You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

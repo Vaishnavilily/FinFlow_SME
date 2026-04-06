@@ -9,7 +9,8 @@ import {
   Settings,
   PieChart,
   Plus,
-  Landmark
+  Landmark,
+  MessageSquareText
 } from "lucide-react";
 import "./Sidebar.css";
 
@@ -54,6 +55,7 @@ export default function Sidebar() {
       ]
     },
     { name: "Reports", href: "/reports", icon: PieChart },
+    { name: "AI Assistant", href: "/ai-assistant", icon: MessageSquareText },
     { name: "Settings", href: "/settings", icon: Settings },
   ];
 
