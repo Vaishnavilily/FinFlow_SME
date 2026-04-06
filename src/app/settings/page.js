@@ -1,13 +1,15 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import "./page.css";
 import "@/components/forms/forms.css";
+import { ThemeContext } from "@/context/ThemeContext";
 
 export default function Settings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const { theme, toggleTheme } = useContext(ThemeContext);
   
   const [formData, setFormData] = useState({
     companyName: "",
@@ -16,6 +18,15 @@ export default function Settings() {
     timezone: "UTC",
     theme: "Light"
   });
+  
+  const handleChange = (e) => {
+  const { name, value } = e.target;
+  setFormData({ ...formData, [name]: value });
+
+  if (name === "theme") {
+    toggleTheme(value.toLowerCase()); // "Light" → "light", "Dark" → "dark"
+  }
+};
 
   useEffect(() => {
     async function fetchSettings() {
@@ -24,6 +35,9 @@ export default function Settings() {
         const json = await res.json();
         if (json.success && json.data) {
           setFormData(json.data);
+          if (json.data.theme) {
+          toggleTheme(json.data.theme.toLowerCase());
+          }
         }
       } catch (error) {
         console.error("Failed to load settings");
