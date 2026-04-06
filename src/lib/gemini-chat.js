@@ -69,7 +69,7 @@ export async function handleGeminiChat(request) {
     const modelName =
       body?.model ||
       process.env.GEMINI_MODEL ||
-      "gemini-1.5-flash";
+      "gemini-2.5-flash";
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
